@@ -1,0 +1,750 @@
+{
+	"info": {
+		"_postman_id": "6a647b07-f5cc-44dd-80a6-ff03a34e664d",
+		"name": "GETnet",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33435287"
+	},
+	"item": [
+		{
+			"name": "Autenticação",
+			"item": [
+				{
+					"name": "autenticação com sucesso",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var data = JSON.parse(responseBody);\r",
+									"if (data > ''){\r",
+									"pm.collectionVariables.set(\"access_token\", data.access_token);\r",
+									"}\r",
+									"pm.test(\"Response is ok\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "Basic {{authString}}"
+							},
+							{
+								"key": "content-type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "scope",
+									"value": "oob",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://{{api_uri}}/auth/oauth/v2/token",
+							"protocol": "https",
+							"host": [
+								"{{api_uri}}"
+							],
+							"path": [
+								"auth",
+								"oauth",
+								"v2",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retornar erro ao não enviar Authorization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Deve retornar erro ao não enviar authorization\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "Basic {{authString}}",
+								"disabled": true
+							},
+							{
+								"key": "content-type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "scope",
+									"value": "oob",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://{{api_uri}}/auth/oauth/v2/token",
+							"protocol": "https",
+							"host": [
+								"{{api_uri}}"
+							],
+							"path": [
+								"auth",
+								"oauth",
+								"v2",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retornar erro ao enviar Authorization inválido",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Deve retornar erro ao enviar Authorization inválido\", function () {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "Basic teste"
+							},
+							{
+								"key": "content-type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "scope",
+									"value": "oob",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://{{api_uri}}/auth/oauth/v2/token",
+							"protocol": "https",
+							"host": [
+								"{{api_uri}}"
+							],
+							"path": [
+								"auth",
+								"oauth",
+								"v2",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Geração do token do cartão",
+			"item": [
+				{
+					"name": "Gerar token com sucesso",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Deve gerar token com sucesso\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Deve conter o atribuito number_token\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('number_token');\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "content-type",
+								"value": "application/json; charset=utf-8"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"card_number\": \"5155901222280001\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{api_uri}}/v1/tokens/card",
+							"protocol": "https",
+							"host": [
+								"{{api_uri}}"
+							],
+							"path": [
+								"v1",
+								"tokens",
+								"card"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Validar Schema de erros",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Importa a biblioteca AJV\r",
+									"const Ajv = require('ajv');\r",
+									"const ajv = new Ajv();\r",
+									"\r",
+									"// Define o schema da resposta\r",
+									"const schema = {\r",
+									"    type: \"object\",\r",
+									"    properties: {\r",
+									"        message: { type: \"string\" },\r",
+									"        name: { type: \"string\" },\r",
+									"        status_code: { type: \"integer\" },\r",
+									"        details: {\r",
+									"            type: \"array\",\r",
+									"            items: {\r",
+									"                type: \"object\",\r",
+									"                properties: {\r",
+									"                    status: { type: \"string\" },\r",
+									"                    error_code: { type: \"string\" },\r",
+									"                    description: { type: \"string\" },\r",
+									"                    description_detail: { type: \"string\" }\r",
+									"                },\r",
+									"                required: [\"status\", \"error_code\", \"description\", \"description_detail\"]\r",
+									"            }\r",
+									"        }\r",
+									"    },\r",
+									"    required: [\"message\", \"name\", \"status_code\", \"details\"]\r",
+									"};\r",
+									"\r",
+									"// Obtém a resposta JSON\r",
+									"const responseJson = pm.response.json();\r",
+									"\r",
+									"// Valida a resposta contra o schema\r",
+									"const validate = ajv.compile(schema);\r",
+									"const valid = validate(responseJson);\r",
+									"\r",
+									"// Teste para verificar se a validação foi bem-sucedida\r",
+									"pm.test(\"A resposta está em conformidade com o schema\", function () {\r",
+									"    pm.expect(valid, validate.errors).to.be.true;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "Bearer teste"
+							},
+							{
+								"key": "content-type",
+								"value": "application/json; charset=utf-8"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"card_numbers\": \"5155901222280001\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{api_uri}}/v1/tokens/card",
+							"protocol": "https",
+							"host": [
+								"{{api_uri}}"
+							],
+							"path": [
+								"v1",
+								"tokens",
+								"card"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retornar erro 401 ao enviar access token inválido",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Deve retornar erro ao enviar campos inválidos\", function () {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});\r",
+									"\r",
+									"// Importa a biblioteca AJV\r",
+									"const Ajv = require('ajv');\r",
+									"const ajv = new Ajv();\r",
+									"\r",
+									"// Define o schema da resposta\r",
+									"const schema = {\r",
+									"    type: \"object\",\r",
+									"    properties: {\r",
+									"        message: { type: \"string\" },\r",
+									"        name: { type: \"string\" },\r",
+									"        status_code: { type: \"integer\" },\r",
+									"        details: {\r",
+									"            type: \"array\",\r",
+									"            items: {\r",
+									"                type: \"object\",\r",
+									"                properties: {\r",
+									"                    status: { type: \"string\" },\r",
+									"                    error_code: { type: \"string\" },\r",
+									"                    description: { type: \"string\" },\r",
+									"                    description_detail: { type: \"string\" }\r",
+									"                },\r",
+									"                required: [\"status\", \"error_code\", \"description\", \"description_detail\"]\r",
+									"            }\r",
+									"        }\r",
+									"    },\r",
+									"    required: [\"message\", \"name\", \"status_code\", \"details\"]\r",
+									"};\r",
+									"\r",
+									"// Obtém a resposta JSON\r",
+									"const responseJson = pm.response.json();\r",
+									"\r",
+									"// Valida a resposta contra o schema\r",
+									"const validate = ajv.compile(schema);\r",
+									"const valid = validate(responseJson);\r",
+									"\r",
+									"// Teste para verificar se a validação foi bem-sucedida\r",
+									"pm.test(\"A resposta está em conformidade com o schema\", function () {\r",
+									"    pm.expect(valid, validate.errors).to.be.true;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "Bearer teste"
+							},
+							{
+								"key": "content-type",
+								"value": "application/json; charset=utf-8"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"card_numbers\": \"5155901222280001\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{api_uri}}/v1/tokens/card",
+							"protocol": "https",
+							"host": [
+								"{{api_uri}}"
+							],
+							"path": [
+								"v1",
+								"tokens",
+								"card"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retornar erro 400 ao enviar campos inválidos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Deve retornar erro ao enviar campos inválidos\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "content-type",
+								"value": "application/json; charset=utf-8"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"card_numbers\": \"5155901222280001\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{api_uri}}/v1/tokens/card",
+							"protocol": "https",
+							"host": [
+								"{{api_uri}}"
+							],
+							"path": [
+								"v1",
+								"tokens",
+								"card"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retornar erro 400 ao não enviar campo obrigatório",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Deve retornar erro ao não enviar campo obrigatório\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "content-type",
+								"value": "application/json; charset=utf-8"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  //\"card_numbers\": \"5155901222280001\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{api_uri}}/v1/tokens/card",
+							"protocol": "https",
+							"host": [
+								"{{api_uri}}"
+							],
+							"path": [
+								"v1",
+								"tokens",
+								"card"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retornar erro 404 ao enviar url inválida",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Deve retornar erro ao enviar URL inválida\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "content-type",
+								"value": "application/json; charset=utf-8"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"card_numbers\": \"5155901222280001\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{api_uri}}/v1/tokens/cards",
+							"protocol": "https",
+							"host": [
+								"{{api_uri}}"
+							],
+							"path": [
+								"v1",
+								"tokens",
+								"cards"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retornar erro 400 ao enviar  campo card_numbers inválido",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Deve retornar erro ao enviar cartão inválido\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "content-type",
+								"value": "application/json; charset=utf-8"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"card_numbers\": \"51559012222800015555555\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{api_uri}}/v1/tokens/card",
+							"protocol": "https",
+							"host": [
+								"{{api_uri}}"
+							],
+							"path": [
+								"v1",
+								"tokens",
+								"card"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retornar erro 404 ao enviar campo card_numbers vazio",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Deve retornar erro ao enviar campo card_numbers vazio\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "content-type",
+								"value": "application/json; charset=utf-8"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"card_numbers\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{api_uri}}/v1/tokens/card",
+							"protocol": "https",
+							"host": [
+								"{{api_uri}}"
+							],
+							"path": [
+								"v1",
+								"tokens",
+								"card"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "authString",
+			"value": "Njc4MjNjNmQtNThkZS00OTRmLTk2ZDktODZhNGMyMjY4MmNiOmMyZDZhMDZmLTVmMzEtNDQ4Yi05MDc5LTdlMTcwZTg1MzZlNA==",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "api_uri",
+			"value": "api-homologacao.getnet.com.br",
+			"type": "string"
+		}
+	]
+}
